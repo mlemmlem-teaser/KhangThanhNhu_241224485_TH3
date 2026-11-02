@@ -1,0 +1,13 @@
+@model IEnumerable<Major>
+<ul class="nav" id="majorFilter">
+    @* id = 0: hiển thị tất cả người học *@
+    <li class="nav-item" id="0">
+        <a class="nav-link" style="cursor:pointer">All</a>
+    </li>
+    @foreach (var m in Model)
+    {
+        <li class="nav-item" id="@m.MajorID">
+            <a class="nav-link" style="cursor:pointer">@m.MajorName</a>
+        </li>
+    }
+</ul>

@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+@model IEnumerable<Learner>
+<div class="ms-2 mx-2">
+    <h1>Learner List</h1>
+    @await Component.InvokeAsync("Major")
+    <!-- Thêm form tìm kiếm -->
+    <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+        <div class="input-group">
+            <input id="keyword" class="form-control" name="keyword" type="text" placeholder="Search learner" />
+            <button id="btnSearch" class="btn btn-primary" type="button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+    <div id="content">
+        @* LearnerTable gồm bảng + thanh nav-phân trang *@
+        <partial name="LearnerTable" model="Model" />
+    </div>
+    <a asp-action="Create" class="btn btn-primary">Create New Student</a>
+</div>
+@section Scripts {
+    <script>
+        // chuyên ngành đang chọn (null/0 = tất cả)
+        var currentMid = "@ViewBag.mid";
+        var filterUrl = "@Url.Action("LearnerFilter", "Learner")";
+
+        function loadLearners(data) {
+            $.ajax({
+                url: filterUrl,
+                data: data,
+                success: function (response) {
+                    $("div#content").html(response);
+                }
+            });
+        }
+
+        // click vào page-item (phần tử được tạo lại sau mỗi lần AJAX nên dùng ủy quyền sự kiện)
+        $('body').on('click', 'li.page-item', function (e) {
+            var data = {
+                mid: $(this).attr("mid"),
+                keyword: $(this).attr("keyword"),
+                pageIndex: $(this).attr("page")
+            };
+            loadLearners(data);
+        });
+
+        // click chọn chuyên ngành: lọc theo ngành, giữ keyword đang nhập
+        $("#majorFilter li").click(function (e) {
+            currentMid = $(this).attr("id");
+            loadLearners({ mid: currentMid, keyword: $("#keyword").val() });
+        });
+
+        // click nút tìm kiếm: tìm theo keyword, giữ chuyên ngành đang chọn
+        $("button#btnSearch").click(function (e) {
+            loadLearners({ mid: currentMid, keyword: $("#keyword").val() });
+        });
+
+        // nhấn Enter trong ô tìm kiếm cũng tìm (không submit form)
+        $("#keyword").on("keypress", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                $("button#btnSearch").click();
+            }
+        });
+    </script>
+}

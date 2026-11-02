@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/MyLayout.cshtml";
+}
+@model IEnumerable<Learner>
+<div class="ms-2 mx-2">
+    <h1>Learner List</h1>
+    @await Component.InvokeAsync("Major")
+    <div id="content">
+        <partial name="LearnerTable" model="Model" />
+    </div>
+    <a asp-action="Create" class="btn btn-primary">Create New Student</a>
+</div>
+@section Scripts {
+    <script>
+        $("#majorFilter li").click(function (e) {
+            var id = $(this).attr("id");
+            //alert(id);
+            $.ajax({
+                url: "@Url.Action("LearnerByMajorID", "Learner")",
+                data: { mid: id },
+                success: function (response) {
+                    $("div#content").html(response);
+                }
+            });
+        });
+    </script>
+}
